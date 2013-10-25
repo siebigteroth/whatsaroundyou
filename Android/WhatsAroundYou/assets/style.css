@@ -1,0 +1,51 @@
+body
+{
+    margin: 0;
+}
+
+#top, #startstop-service
+{
+    width: 100%;
+    padding: 10px;
+    display: -webkit-box;
+    -webkit-box-pack: center;
+    -webkit-box-align: center;
+}
+
+#tracks, #results
+{
+    position: absolute;
+    top: 55px;
+}
+
+#results
+{
+    display: none;
+}
+
+#top
+{
+    background-color: #ffffff;
+    position: fixed;
+    top: 0;
+    z-index: 5;
+    height: 55px;
+    border-bottom: #ffffff solid 2px;
+}
+
+#hint
+{
+    position: absolute;
+    left: 50%;
+    bottom: 20px;
+    margin-left: -64px;
+    z-index: 4;
+}
+
+#startstop-service
+{
+    position: fixed;
+    bottom: 0;
+    z-index: 5;
+    border-top: #ffffff solid 2px;
+}
