@@ -1,28 +1,11 @@
 function initWebview() {
     $('body').append('<div id="top"></div>');
-    $('body').append('<div id="tracks"></div>');
-    $('body').append('<div id="results"></div>');
-    
-    //tracks
-    android.reloadTracks();
-    
-    //search
-    $('#top').append('<div class="field">'+
-                     '<input class="wide text input" type="text" placeholder="'+lng('search')+'" id="search"/>'+
-                     '<div class="medium primary btn">'+
-                     '<a href="#"><i class="icon-search"></i></a>'+
-                     '</div>'+
-                     '</div>');
-    $('#search').click(function(){
-        $('#tracks').hide();
-        $('#results').show('fast');
-        $('#results').empty();
-        $('#results').append('<div class="medium primary btn icon-left-circled">'+
-         '<a href="#">'+lng('back')+'</a>'+
-         '</div>');
-        $('#results').append('<div>'+lng('search_results')+'<ul></ul></div>');
-        android.searchFor($('#top input').val());
-    });
+    $('#top').append('<p>All map tiles stored by the WhatsAroundYou application, were created by '+
+                     '<a href="#" onclick="javascript:android.openURL(\'http://stamen.com/\');">Stamen Design</a>, under '+
+                     '<a href="#" onclick="javascript:android.openURL(\'http://creativecommons.org/licenses/by/3.0\');">CC BY 3.0</a>.<br>'+
+                     'Map data by '+
+                     '<a href="#" onclick="javascript:android.openURL(\'http://openstreetmap.org/\');">OpenStreetMap</a>, under '+
+                     '<a href="#" onclick="javascript:android.openURL(\'http://creativecommons.org/licenses/by-sa/3.0\');">CC BY SA</a>.</p>');
     
     //start/ stop button
     $('body').append('<div class="medium primary btn" id="startstop-service">'+
@@ -54,46 +37,13 @@ function connectionFailed() {
     $('#startstop-service').find('.text').html(lng('start_service'));
 }
 
-function listTracks() {
-    $('#tracks').empty();
-    $('#tracks').append('<ul></ul>');
-    var headertext;
-    if(tracks.length==0)
-        headertext=lng('no_tracks');
-    else
-    {
-        for(var i=0; i<tracks.length; i++)
-        {
-            var track = tracks[i];
-            $('#tracks > ul').append('<li onclick="javascript:loadTrack('+track+');">'+track+'</li>');
-        }
-        headertext=lng('tracks');
-    }  
-    $('#tracks').prepend(headertext);
-}
-
-function loadTrack(filename)
+function loadImage(imageData)
 {
-    console.log('loadTrack: '+filename);
-    android.loadTrack(filename);
-}
-
-function unloadTrack()
-{
-    
-}
-
-function addSearchResult(index,name)
-{
-    $('#results > div > ul').append('<li onclick="javascript:loadResult('+index+');">'+name+'</li>');
-}
-
-function loadResult(index)
-{
-    console.log('loadResult: '+index);
+    $('#top > img').remove();
+    var image = '<img src="data:image/png;base64,'+imageData+'"/>';
+    $('#top').append('<img src="'+image+'"/>');
 }
 
 function switchOptionsMenu() {
-    $('body').append('<br>Hallo Welt!');
-    console.log('OptionsMenu');
+    //unused
 }

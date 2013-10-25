@@ -12,34 +12,9 @@ body
     -webkit-box-align: center;
 }
 
-#tracks, #results
-{
-    position: absolute;
-    top: 55px;
-}
-
-#results
-{
-    display: none;
-}
-
 #top
 {
-    background-color: #ffffff;
-    position: fixed;
-    top: 0;
-    z-index: 5;
-    height: 55px;
-    border-bottom: #ffffff solid 2px;
-}
-
-#hint
-{
-    position: absolute;
-    left: 50%;
-    bottom: 20px;
-    margin-left: -64px;
-    z-index: 4;
+    text-align: center;
 }
 
 #startstop-service

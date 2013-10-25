@@ -168,6 +168,10 @@ public class MainActivity extends Activity {
 			    	break;
 	    		case 2: //disconnected
 		        	break;
+	    		case 3: //load image
+	    			String imageBase64Data = i.getStringExtra("data");
+	    			executeJavascript("loadImage("+imageBase64Data+");");
+	    			break;
 	    	}
 	    }
 	};

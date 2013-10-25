@@ -31,6 +31,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Base64;
 import android.util.Log;
 
 public class AgentLocationListener implements LocationListener {
@@ -38,7 +39,6 @@ public class AgentLocationListener implements LocationListener {
 	public int zoom;
 	private Context context;
 	public Location lastLocation;
-	public ArrayList<double[]> paths;
 	
 	public AgentLocationListener(Context context) {
 		super();
@@ -47,7 +47,6 @@ public class AgentLocationListener implements LocationListener {
 		this.lastLocation = new Location("");
 		this.lastLocation.setLatitude(40.752361);
 		this.lastLocation.setLongitude(-73.966978);
-		this.paths = new ArrayList<double[]>();
 	}
 
 	@Override
@@ -57,16 +56,7 @@ public class AgentLocationListener implements LocationListener {
 	public void onProviderEnabled(String provider) {}
 	
 	@Override
-	public void onLocationChanged(Location location) {
-		//add tracking step
-		if(((AgentService)context).tracking == true)
-		{
-			((AgentService)context).tracks.add("<trkseg>");
-			((AgentService)context).tracks.add("<trkpt lat=\""+this.lastLocation.getLatitude()+"\" lon=\""+this.lastLocation.getLongitude()+"\"></trkpt>");
-			((AgentService)context).tracks.add("<trkpt lat=\""+location.getLatitude()+"\" lon=\""+location.getLongitude()+"\"></trkpt>");
-			((AgentService)context).tracks.add("</trkseg>");
-		}
-		
+	public void onLocationChanged(Location location) {	
 		//update old location and tile
 		this.lastLocation=location;
 		sendTile();
@@ -89,8 +79,11 @@ public class AgentLocationListener implements LocationListener {
 	//send the generated tile to the smartwatch
 	public void sendTile()
 	{
-		byte[] imageData = getMapImage(lastLocation.getLatitude(), lastLocation.getLongitude());
-		((AgentService)context).bluetoothThread.sendData(imageData);
+		byte[] imageData = getMapImage(lastLocation.getLatitude(), lastLocation.getLongitude());	
+		((AgentService)context).bluetoothThread.sendData(imageData); //send data to smartwatch
+		
+		String imageBase64Data = Base64.encodeToString(imageData, Base64.DEFAULT);
+		((AgentService)context).loadImage(imageBase64Data); //(re)load map image in webview
 	}
 	
 	//calculate the correct coordinates
@@ -175,7 +168,7 @@ public class AgentLocationListener implements LocationListener {
 		        out.close();
 			}
 			
-		    return addTracks(bitmap, new BoundingBox(x, y));
+		    return bitmap;
 		}
 		catch (Exception e) { //return empty bitmap on error
 			e.printStackTrace();
@@ -197,67 +190,6 @@ public class AgentLocationListener implements LocationListener {
 	    canvas.drawCircle(x, y, 10, paint);
 		
 		return bitmap;
-	}
-	
-	//add tracks
-	private Bitmap addTracks(Bitmap bitmap, BoundingBox box)
-	{
-		if(paths.size()==0)
-			return bitmap;
-		else
-		{
-			for(double[] position : paths)
-			{
-				/*
-				 * to do: check if box.contains a path from position-1 to position
-				 * attention: a path can start anywhere, so every lat/ lng within position-1 to position has to be checked!
-				 * to get the position of a lat/ lng see "get position on tile" below
-				 *
-					//draw line
-					Canvas canvas = new Canvas(bitmap);
-					Paint paint = new Paint();
-					canvas.drawLine(x1, y1, x2, y2, paint);
-				*/
-			}
-			return bitmap;
-		}
-	}
-	
-	//a bounding box defines a tiles bounding
-	private class BoundingBox
-	{
-		double[] northWest;
-		double[] southEast;
-		
-		public BoundingBox(int x, int y)
-		{	
-			//north west edge
-			northWest = new double[2];
-			northWest[0] = getLongitude(x, zoom);
-			northWest[1] = getLatitude(y, zoom);
-			
-			//soth east edge
-			southEast = new double[2];
-			southEast[0] = getLongitude(x+1, zoom);
-			southEast[1] = getLatitude(y+1, zoom);
-		}
-		
-		private double getLongitude(int x, int zoom) {
-			return x/Math.pow(2,zoom)*360.0-180.0;
-		}
-		
-		private double getLatitude(int y, int zoom) {
-			return Math.toDegrees(Math.atan(Math.sinh(Math.PI-2*y/Math.pow(2,zoom))));
-		}
-		
-		//checks, if the tile contains a latitude and longitude
-		public boolean contains(double lng, double lat)
-		{
-			if(lng>northWest[0] && lng<southEast[0] && lat<northWest[1] && lat>southEast[1])
-				return true;
-			else
-				return false;
-		}
 	}
 	
 	//generate the map tile
