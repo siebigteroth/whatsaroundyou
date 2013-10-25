@@ -8,3 +8,10 @@ key features:
 - start/ stop tracking and save tracks automatically for later navigation
 
 More details here: http://forums.agentwatches.com/index.php?/topic/181-app-maps-application-whatsaroundyou/#entry1334
+
+The master-branch is still in development.
+Use the without_navigation-branch instead.
+
+The without_navigation-branch offers the following key features:
+- display a map image of your current position on your wrist
+- start/ stop tracking  and save the tracks as .gpx-file
