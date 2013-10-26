@@ -71,34 +71,24 @@ namespace WhatsAroundYou
         {
             switch (pin)
             {
-                case 2: //top button
-                    if (value == 1 && zoom < zoom_max)
+                case 2: //top button; zoom in
+                    if (zoom < zoom_max)
                     {
                         zoom++;
                         sendData();
                     }
-                    else if(value == 0 && zoom > zoom_min)
-                    {
-                        zoom--;
-                        sendData();
-                    }
                     break;
-                case 3: //middle button
+                case 3: //middle button; start/ stop tracking
                     if (tracking == true)
                         tracking = false;
                     else
                         tracking = true;
                     sendData();
                     break;
-                case 4: //bottom button
+                case 4: //bottom button; zoom out
                     if (value == 1 && zoom > zoom_min)
                     {
                         zoom--;
-                        sendData();
-                    }
-                    else if (value == 0 && zoom < zoom_max)
-                    {
-                        zoom++;
                         sendData();
                     }
                     break;
@@ -114,7 +104,10 @@ namespace WhatsAroundYou
             else
                 datastring += "0";
             byte[] data = Encoding.UTF8.GetBytes(datastring + ",");
-            serial.Write(data,0,data.Length);
+
+            Debug.Print(datastring);
+
+            //serial.Write(data,0,data.Length);
         }
     }
 }
