@@ -101,7 +101,7 @@ public class AgentService extends Service {
 	{
 		try
 		{
-			URL url = new URL("http://maps.googleapis.com/maps/api/directions/json?sensor=false&mode="+mode+"&origin="+
+			URL url = new URL("INSERT URL HERE"+mode+"&origin="+
 					locationListener.lastLocation.getLatitude()+","+locationListener.lastLocation.getLongitude()+
 					"&destination="+lat+","+lng);
 			InputStream inputStream = (InputStream)url.getContent();
