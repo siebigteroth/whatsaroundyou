@@ -64,7 +64,7 @@ public class JavascriptInterface {
 	public void searchFor(String text)
 	{
 		try {
-			URL url = new URL("http://maps.googleapis.com/maps/api/geocode/json?sensor=false&address="+text);
+			URL url = new URL("INSERT URL HERE"+text);
 			InputStream inputStream = (InputStream)url.getContent();
 			byte[] buffer = new byte[255];
 			inputStream.read(buffer);
