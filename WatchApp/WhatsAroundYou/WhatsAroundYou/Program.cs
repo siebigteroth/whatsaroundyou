@@ -14,7 +14,7 @@ namespace WhatsAroundYou
         static int zoom = 10; //has to be equal to android apps default zoom value
         static int zoom_min = 0;
         static int zoom_max = 18;
-        static bool tracking = false;
+        static bool action = false; //action/ mid button
 
         static Font font = null;
         static Bitmap display;
@@ -78,11 +78,11 @@ namespace WhatsAroundYou
                         sendData();
                     }
                     break;
-                case 3: //middle button; start/ stop tracking
-                    if (tracking == true)
-                        tracking = false;
+                case 3: //middle button; start/ stop action
+                    if (action == true)
+                        action = false;
                     else
-                        tracking = true;
+                        action = true;
                     sendData();
                     break;
                 case 4: //bottom button; zoom out
@@ -99,7 +99,7 @@ namespace WhatsAroundYou
         static void sendData()
         {
             String datastring = zoom + ",";
-            if(tracking)
+            if(action)
                 datastring += "1";
             else
                 datastring += "0";
