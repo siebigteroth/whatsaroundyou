@@ -9,5 +9,10 @@
     <string name="starting_service">connecting to the smartwatch</string>
     <string name="connected">connected</string>
     <string name="disconnected">disconnected</string>
+    <string name="start_service">connect</string>
+    <string name="stop_service">disconnect</string>
+    <string name="dialogtitle">informations</string>
+    <string name="close">close</string>
+    <string name="credits">Application developed by <a href="http://siebigteroth.me">Tim Siebigteroth</a>. Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>.</string>
 
 </resources>

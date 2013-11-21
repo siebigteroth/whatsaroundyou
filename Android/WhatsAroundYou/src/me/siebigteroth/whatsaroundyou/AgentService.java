@@ -1,13 +1,8 @@
 package me.siebigteroth.whatsaroundyou;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
 
@@ -18,7 +13,6 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
 import android.location.LocationManager;
-import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
@@ -28,7 +22,7 @@ public class AgentService extends Service {
 	private BluetoothSocket bluetoothSocket;
 	private LocationManager locationManager;
 	private AgentLocationListener locationListener;
-	public boolean tracking = false;
+	public boolean AdditionalAction = false;
 	public BluetoothThread bluetoothThread;
 	public ArrayList<String> tracks;
 
@@ -100,44 +94,16 @@ public class AgentService extends Service {
         	throwError(getResources().getString(R.string.no_device_found));
 	}
 	
-	private void startTracking()
+	private void startAdditionalAction()
 	{
-		tracking=true;
-		tracks = new ArrayList<String>();
-		tracks.add("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>");
-		tracks.add("<gpx version=\"1.1\" creator=\"WhatsAroundYou\">");
-		tracks.add("<trk>");
+		AdditionalAction=true;
+		//to do
 	}
 	
-	private void stopTracking()
+	private void stopAdditionalAction()
 	{
-		tracking=false;
-		tracks.add("</trk>");
-		tracks.add("</gpx>");
-		
-		try {
-			//create gpx file
-			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	        String filename = simpleDateFormat.format(new Date());
-			String filepath =  Environment.getExternalStorageDirectory() + File.separator + "WhatsAroundYou/tracks/"+filename+".gpx";
-			File file = new File(filepath);
-			if(!file.exists())
-			{
-				file.createNewFile();
-				
-				//put route as gpx-track-file into the external storage
-		        FileOutputStream out = new FileOutputStream(file);
-		        PrintWriter pw = new PrintWriter(out);
-		        for(String line : tracks) //write line by line
-		        	pw.println(line);
-		        pw.close();
-		        out.close();
-			}
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
+		AdditionalAction=false;
+		//to do
 	}
 	
 	public class BluetoothThread extends Thread {
@@ -165,10 +131,10 @@ public class AgentService extends Service {
                 	
     	        	if(locationListener!=null)
     	        		locationListener.setZoom(Integer.parseInt(receivedData[0]));
-    	        	if(Integer.parseInt(receivedData[1])==1 && tracking==false)
-    	        		startTracking();
-    	        	else if(tracking==true)
-    	        		stopTracking();
+    	        	if(Integer.parseInt(receivedData[1])==1 && AdditionalAction==false)
+    	        		startAdditionalAction();
+    	        	else if(AdditionalAction==true)
+    	        		stopAdditionalAction();
                 }
                 catch (Exception e) {}
             }

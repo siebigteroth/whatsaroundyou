@@ -2,70 +2,39 @@ package me.siebigteroth.whatsaroundyou;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.Locale;
-
-import org.json.JSONArray;
 
 import android.os.Bundle;
 import android.os.Environment;
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.util.Log;
+import android.text.method.LinkMovementMethod;
 import android.view.Menu;
-import android.webkit.ConsoleMessage;
-import android.webkit.ConsoleMessage.MessageLevel;
-import android.webkit.WebChromeClient;
-import android.webkit.WebView;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.RelativeLayout.LayoutParams;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
 	
-	private WebView webView;
 	private IntentFilter TaskIntent;
-	public ProgressDialog dialog=null;
+	private ProgressDialog progress=null;
+	private Dialog dialog=null;
+	private Button btn;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
-		//init webview
-		webView = (WebView) findViewById(R.id.webView);
-		webView.getSettings().setJavaScriptEnabled(true);
-		webView.getSettings().setDatabaseEnabled(true);
-		String databasePath = this.getApplicationContext().getDir("database",Context.MODE_PRIVATE).getPath();
-		webView.getSettings().setDatabasePath(databasePath);
-		webView.getSettings().setDomStorageEnabled(true);
-		webView.addJavascriptInterface(new JavascriptInterface(this), "android");
-		webView.setVerticalScrollBarEnabled(false);
-		webView.setWebChromeClient(new WebChromeClient() {
-			
-			//maximum databasesize reached
-			@Override
-		    public void onExceededDatabaseQuota(String url, String databaseIdentifier, long currentQuota,
-		    		long estimatedSize, long totalUsedQuota, android.webkit.WebStorage.QuotaUpdater quotaUpdater) {
-		        quotaUpdater.updateQuota(estimatedSize * 2); //double database quota
-		    }
-			
-			@Override
-			public boolean onConsoleMessage(ConsoleMessage cm) {
-				if(cm.messageLevel()!=MessageLevel.ERROR)
-					Log.d(cm.messageLevel().name(), cm.message() + " (" + cm.sourceId() + ":" + cm.lineNumber()+")");
-				else
-					Log.d(cm.messageLevel().name(), cm.message());
-				return true;
-			}
-		});
-		
-		//restore webview state
-		if(savedInstanceState!=null)
-			webView.restoreState(savedInstanceState);
-		else
-			webView.loadUrl("file:///android_asset/index.html");
 		
 		//set intentfilter
 		TaskIntent = new IntentFilter();
@@ -76,15 +45,62 @@ public class MainActivity extends Activity {
     		registerReceiver(TaskReceiver, TaskIntent);
     	}
     	catch(Exception e) {}
+		
+		//create directories and readmefile within
+		createDirectories();
+		
+		//add button handler
+		btn = (Button)findViewById(R.id.connect);
+		btn.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				toggleAgentService();
+			}
+		});
+		
+		//set init button text
+		btn.setText(R.string.start_service);
+		
+		//init image view
+		ImageView image = (ImageView)findViewById(R.id.image);
+		image.setImageResource(R.drawable.ic_launcher); //to do: replace resource
 	}
 
+	//show credit informations on option key press
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		webView.loadUrl("javascript:switchOptionsMenu();");
+		if(dialog==null || dialog.isShowing()==false)
+		{
+			//new dialog
+			dialog = new Dialog(this);
+			dialog.setContentView(R.layout.dialog);
+			dialog.setTitle(R.string.dialogtitle);
+			
+			//init image
+			ImageView image = (ImageView)dialog.findViewById(R.id.icon);
+			image.setImageResource(R.drawable.ic_launcher); //to do: replace by information-icon
+			
+			//make links clickable
+			TextView text = (TextView)dialog.findViewById(R.id.text);
+			text.setMovementMethod(LinkMovementMethod.getInstance());
+			
+			//add close button handler
+			Button btnClose = (Button)dialog.findViewById(R.id.close);
+			btnClose.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					dialog.dismiss();
+				}
+			});
+			
+			dialog.show();
+		}
+		
 		return false;
 	}
 	
-	public void initWebview() {
+	//create directories and readme file within
+	private void createDirectories() {
 		try
 		{
 			//create directories, if they don't exist yet
@@ -128,23 +144,46 @@ public class MainActivity extends Activity {
 			}
 		}
 		catch(Exception e) {}
-		
-		executeJavascript("initLanguage('"+Locale.getDefault().getLanguage()+"');");
-		executeJavascript("initWebview();");
 	}
 	
-	public void executeJavascript(final String script) {
-		runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-            	webView.loadUrl("javascript:"+script);
-            }
-        });
-	}
 	
 	@Override
 	protected void onSaveInstanceState(Bundle newInstanceState) {
-		webView.saveState(newInstanceState);
+		
+	}
+	
+	//check if service is running and return true or false
+	private boolean isAgentServiceRunning()
+	{
+		ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+	    for (RunningServiceInfo service : activityManager.getRunningServices(Integer.MAX_VALUE)) {
+	        if (AgentService.class.equals(service.service.getClass())) { //service is running
+	            return true;
+	        }
+	    }
+	    return false;
+	}
+	
+	//check if service is running and start if true or stop
+	private void toggleAgentService() {
+	    if(isAgentServiceRunning())
+	    	stopAgentService();
+	    else
+	    	startAgentService();
+	}
+	
+	//start the agent service
+	private void startAgentService()
+	{
+		progress = ProgressDialog.show(this, "", getResources().getString(R.string.starting_service), true);
+		startService(new Intent(this, AgentService.class));
+	}
+	
+	//stop the agent service
+	private void stopAgentService()
+	{
+		showToast(getString(R.string.disconnected));
+		stopService(new Intent(this, AgentService.class));
 	}
 	
 	//task-receiver
@@ -156,37 +195,26 @@ public class MainActivity extends Activity {
 	    	
 	    	switch(task) {
 	    		case 0: //error
-	    			if(dialog!=null)
-	    				dialog.dismiss();
+	    			if(progress!=null)
+	    				progress.dismiss();
 	    			stopService(new Intent(MainActivity.this,AgentService.class));
-	    			executeJavascript("connectionFailed();");
 		        	break;
 	    		case 1: //connected
-	    			if(dialog!=null)
-	    				dialog.dismiss();
+	    			if(progress!=null)
+	    				progress.dismiss();
 			    	showToast(getResources().getString(R.string.connected));
+			    	btn.setText(R.string.stop_service); //change button text
 			    	break;
 	    		case 2: //disconnected
+	    			btn.setText(R.string.start_service); //reset button text
 		        	break;
 	    		case 3: //load image
 	    			String imageBase64Data = i.getStringExtra("data");
-	    			executeJavascript("loadImage("+imageBase64Data+");");
+	    			//to do: might be used to replace the imageview with the current view of the samrtwatchs map view
 	    			break;
 	    	}
 	    }
 	};
-	
-	//set javascripts var tracks
-	public void setTracks()
-	{
-		String directorypath = Environment.getExternalStorageDirectory() + File.separator + "WhatsAroundYou/tracks/";
-		File directory = new File(directorypath);
-		JSONArray varTracks = new JSONArray();
-		File[] files = directory.listFiles();
-		for (File file : files)
-			varTracks.put(file.getName());
-		executeJavascript("tracks=JSON.parse("+varTracks.toString()+");");
-	}
 	
 	@Override
     protected void onResume() {

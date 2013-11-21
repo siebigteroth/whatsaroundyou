@@ -9,5 +9,10 @@
     <string name="starting_service">Verbindung wird hergestellt</string>
     <string name="connected">erfolgreich verbunden</string>
     <string name="disconnected">Verbindung getrennt</string>
+    <string name="start_service">verbinde mit Smartwatch</string>
+    <string name="stop_service">trenne Verbindung</string>
+    <string name="dialogtitle">Informationen</string>
+    <string name="close">schließen</string>
+    <string name="credits">Applikation entwickelt von <a href="http://siebigteroth.me">Tim Siebigteroth</a>. Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>.</string>
 
 </resources>
