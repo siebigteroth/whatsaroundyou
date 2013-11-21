@@ -4,6 +4,7 @@ WhatsAroundYou is a maps application for the agent smartwatch, based on OpenStre
  
 key features:
 - display a map image of your current position on your wrist
+
 more coming soon
 
 More details here: http://forums.agentwatches.com/index.php?/topic/181-app-maps-application-whatsaroundyou/#entry1334
