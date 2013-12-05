@@ -45,6 +45,8 @@ public class AgentLocationListener implements LocationListener {
 		this.zoom = 10;
 		this.context = context;
 		this.lastLocation = new Location("");
+		
+		//default location; NY
 		this.lastLocation.setLatitude(40.752361);
 		this.lastLocation.setLongitude(-73.966978);
 	}
@@ -70,8 +72,6 @@ public class AgentLocationListener implements LocationListener {
 	//set zoom and update tile
 	public void setZoom(int zoom)
 	{
-		this.lastLocation.setLatitude(40.752361); //sample data >> DELETE
-		this.lastLocation.setLongitude(-73.966978); //sample data >> DELETE
 		this.zoom=zoom;
 		sendTile();
 	}

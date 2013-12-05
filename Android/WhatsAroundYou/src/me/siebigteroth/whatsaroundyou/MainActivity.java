@@ -14,13 +14,15 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.text.method.LinkMovementMethod;
+import android.util.Base64;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +32,7 @@ public class MainActivity extends Activity {
 	private ProgressDialog progress=null;
 	private Dialog dialog=null;
 	private Button btn;
+	private ImageView image;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -62,13 +65,22 @@ public class MainActivity extends Activity {
 		btn.setText(R.string.start_service);
 		
 		//init image view
-		ImageView image = (ImageView)findViewById(R.id.image);
-		image.setImageResource(R.drawable.ic_launcher); //to do: replace resource
+		image = (ImageView)findViewById(R.id.image);
+		image.setImageResource(R.drawable.ic_launcher);
+		
+		//show credit informations on start up
+		showCredit();
 	}
 
 	//show credit informations on option key press
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		showCredit();
+		return false;
+	}
+	
+	//show credit information
+	private void showCredit() {
 		if(dialog==null || dialog.isShowing()==false)
 		{
 			//new dialog
@@ -76,9 +88,9 @@ public class MainActivity extends Activity {
 			dialog.setContentView(R.layout.dialog);
 			dialog.setTitle(R.string.dialogtitle);
 			
-			//init image
+			//init information icon
 			ImageView image = (ImageView)dialog.findViewById(R.id.icon);
-			image.setImageResource(R.drawable.ic_launcher); //to do: replace by information-icon
+			image.setImageResource(R.drawable.information);
 			
 			//make links clickable
 			TextView text = (TextView)dialog.findViewById(R.id.text);
@@ -95,8 +107,6 @@ public class MainActivity extends Activity {
 			
 			dialog.show();
 		}
-		
-		return false;
 	}
 	
 	//create directories and readme file within
@@ -204,13 +214,20 @@ public class MainActivity extends Activity {
 	    				progress.dismiss();
 			    	showToast(getResources().getString(R.string.connected));
 			    	btn.setText(R.string.stop_service); //change button text
+			    	
+			    	//reset image view
+			    	image = (ImageView)findViewById(R.id.image);
+					image.setImageResource(R.drawable.ic_launcher);
+					
 			    	break;
 	    		case 2: //disconnected
 	    			btn.setText(R.string.start_service); //reset button text
 		        	break;
 	    		case 3: //load image
 	    			String imageBase64Data = i.getStringExtra("data");
-	    			//to do: might be used to replace the imageview with the current view of the samrtwatchs map view
+	    			byte[] decodedImageData = Base64.decode(imageBase64Data, Base64.DEFAULT); //decode to bytearray
+	    			Bitmap bitmap = BitmapFactory.decodeByteArray(decodedImageData, 0, decodedImageData.length); //create bitmap from bytearray
+	    			image.setImageBitmap(bitmap); //replace the imageview with the current view of the smartwatches map view
 	    			break;
 	    	}
 	    }

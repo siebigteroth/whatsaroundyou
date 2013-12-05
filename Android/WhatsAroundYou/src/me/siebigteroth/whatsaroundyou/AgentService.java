@@ -1,6 +1,8 @@
 package me.siebigteroth.whatsaroundyou;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Set;
@@ -22,7 +24,7 @@ public class AgentService extends Service {
 	private BluetoothSocket bluetoothSocket;
 	private LocationManager locationManager;
 	private AgentLocationListener locationListener;
-	public boolean AdditionalAction = false;
+	public boolean additionalAction = false;
 	public BluetoothThread bluetoothThread;
 	public ArrayList<String> tracks;
 
@@ -96,13 +98,32 @@ public class AgentService extends Service {
 	
 	private void startAdditionalAction()
 	{
-		AdditionalAction=true;
+		additionalAction=true;
 		//to do
+		//String list = "Eintrag 1, Eintrag 2, Eintrag 3";
+		try
+		{
+			ArrayList<String> list = new ArrayList<String>();
+			
+			//get latitude and longitude of the lastest location
+			double lat = locationListener.lastLocation.getLatitude();
+			double lng = locationListener.lastLocation.getLongitude();
+			
+			//to do: lat, lng an Abfrage der ÖPNV-Liste übergeben; Liste konvertieren und Elemente zu list als formartierten String hinzufügen
+			
+			//convert list to byte array
+			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+			ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+			objectOutputStream.writeObject(list);
+			
+			bluetoothThread.sendData(byteArrayOutputStream.toByteArray()); //send data to smartwatch
+		}
+		catch (Exception e) {}
 	}
 	
 	private void stopAdditionalAction()
 	{
-		AdditionalAction=false;
+		additionalAction=false;
 		//to do
 	}
 	
@@ -125,15 +146,13 @@ public class AgentService extends Service {
                 try {
                 	inputStream.read(buffer);
                 	
-                	Log.i("test", "erhaltene Daten: " + new String(buffer, 0, buffer.length));
-                	
                 	String[] receivedData = new String(buffer, 0, buffer.length).split(",");
                 	
     	        	if(locationListener!=null)
     	        		locationListener.setZoom(Integer.parseInt(receivedData[0]));
-    	        	if(Integer.parseInt(receivedData[1])==1 && AdditionalAction==false)
+    	        	if(Integer.parseInt(receivedData[1])==1 && additionalAction==false)
     	        		startAdditionalAction();
-    	        	else if(AdditionalAction==true)
+    	        	else if(additionalAction==true)
     	        		stopAdditionalAction();
                 }
                 catch (Exception e) {}

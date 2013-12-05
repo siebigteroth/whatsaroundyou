@@ -20,6 +20,8 @@ namespace WhatsAroundYou
         static Bitmap display;
         static SerialPort serial = null;
 
+        static Menu menu;
+
         public static void Main()
         {
             //default font
@@ -58,9 +60,17 @@ namespace WhatsAroundYou
             try
             {
                 display.Dispose(); //remove old bitmap
-                byte[] receivedImageData = new byte[serial.BytesToRead]; //buffer for the data
-                serial.Read(receivedImageData, 0, serial.BytesToRead); //get byte data
-                display = new Bitmap(receivedImageData, Bitmap.BitmapImageType.Jpeg); //generate bitmap; compression is jpeg, becaue it's the only compression also supported by android
+                byte[] receivedData = new byte[serial.BytesToRead]; //buffer for the data
+                serial.Read(receivedData, 0, serial.BytesToRead); //get byte data
+
+                if (action == false) //show image, if additional action is inactive
+                    display = new Bitmap(receivedData, Bitmap.BitmapImageType.Jpeg); //generate bitmap; compression is jpeg, becaue it's the only compression also supported by android
+                else
+                {
+                    String list = receivedData.ToString(); //to do
+                    menu = new Menu(list, display, font);
+                }
+
                 display.Flush();
             }
             catch {} //discard invalid bitmaps
@@ -72,25 +82,45 @@ namespace WhatsAroundYou
             switch (pin)
             {
                 case 2: //top button; zoom in
-                    if (zoom < zoom_max)
+                    if (action == false)
                     {
-                        zoom++;
-                        sendData();
+                        if (zoom < zoom_max)
+                        {
+                            zoom++;
+                            sendData();
+                        }
                     }
+                    else
+                        menu.down();
                     break;
                 case 3: //middle button; start/ stop action
                     if (action == true)
-                        action = false;
+                    {
+                        if (menu != null && menu.current == 0)
+                        {
+                            action = false;
+                            //to do: reset bitmap to map
+                        }
+                        else
+                        {
+                            //to do: send details for current-1
+                        }
+                    }
                     else
                         action = true;
                     sendData();
                     break;
                 case 4: //bottom button; zoom out
-                    if (value == 1 && zoom > zoom_min)
+                    if (action == false)
                     {
-                        zoom--;
-                        sendData();
+                        if (value == 1 && zoom > zoom_min)
+                        {
+                            zoom--;
+                            sendData();
+                        }
                     }
+                    else
+                        menu.up();
                     break;
             }
         }
