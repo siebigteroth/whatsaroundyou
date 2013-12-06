@@ -10,10 +10,11 @@ namespace WhatsAroundYou
         public int current;
         private Bitmap bitmap;
         private Font font;
+        public bool selected;
 
         public Menu(String list, Bitmap bitmap, Font font)
         {
-            String[] listItems = list.Split(",".ToCharArray());
+            String[] listItems = list.Split(";".ToCharArray());
             this.items = new String[listItems.Length + 1];
             this.items[0] = "back";
             for (int i = 0; i < listItems.Length; i++)
@@ -21,7 +22,7 @@ namespace WhatsAroundYou
             this.current = 0;
             this.bitmap = bitmap;
             this.font = font;
-            this.draw();
+            this.selected = false;
         }
 
         public void up()
@@ -38,7 +39,7 @@ namespace WhatsAroundYou
             draw();
         }
 
-        private void draw()
+        public void draw()
         {
             bitmap = new Bitmap(Bitmap.MaxWidth, Bitmap.MaxHeight);
             bitmap.Clear();

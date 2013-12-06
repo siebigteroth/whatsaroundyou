@@ -100,7 +100,7 @@ public class AgentService extends Service {
 	{
 		additionalAction=true;
 		//to do
-		//String list = "Eintrag 1, Eintrag 2, Eintrag 3";
+		//String list = "entry 1;entry 2;entry 3; entry"; //before implode: replace each semicolon in each entry with a comma
 		try
 		{
 			ArrayList<String> list = new ArrayList<String>();
@@ -154,6 +154,11 @@ public class AgentService extends Service {
     	        		startAdditionalAction();
     	        	else if(additionalAction==true)
     	        		stopAdditionalAction();
+    	        	if(additionalAction==true)
+    	        	{
+    	        		int itemIndex = Integer.parseInt(receivedData[2]);
+    	        		//to do: send details of the itemIndex as string
+    	        	}
                 }
                 catch (Exception e) {}
             }
