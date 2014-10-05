@@ -7,4 +7,6 @@ key features:
 
 more coming soon
 
+![alt tag](https://rawgit.com/siebigteroth/whatsaroundyou/screenshot.jpg)
+
 More details here: http://forums.agentwatches.com/index.php?/topic/181-app-maps-application-whatsaroundyou/#entry1334
